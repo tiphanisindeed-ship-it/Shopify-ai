@@ -11,15 +11,20 @@ export default async function handler(req, res) {
 
     const message = body?.message || "hello";
 
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-5",
-        input: message
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "user",
+            content: message
+          }
+        ]
       })
     });
 
@@ -35,7 +40,7 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     const reply =
-      data?.output?.[0]?.content?.[0]?.text ||
+      data?.choices?.[0]?.message?.content ||
       "No response";
 
     return res.status(200).json({ reply });
